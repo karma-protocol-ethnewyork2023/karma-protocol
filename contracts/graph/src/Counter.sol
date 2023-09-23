@@ -33,17 +33,16 @@ contract Counter {
     uint256 fromId = nodes[from];
     uint256 toId = nodes[to];
 
-    // non-directional graph.
+    // directional graph.
     edges[fromId] = toId;
-    edges[toId] = fromId;
   }
 
-  function register(address addr) internal {
-    if (nodes[addr] == 0) {
-      nodes[addr] = index;
-      nodeToAddr[index] = addr;
-      index++;
-    }
+  function register(address addr) public {
+    require(addr != address(0), "Cannot have null address");
+    require(nodes[addr] == 0, "Address already registered");
+    nodes[addr] = index;
+    nodeToAddr[index] = addr;
+    index++;
   }
 
   function getNodeId(address addr) internal view returns (uint256) {
