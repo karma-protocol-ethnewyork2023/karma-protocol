@@ -1,1 +1,5 @@
 *.ptau
+*.r1cs
+*.r1cs.json
+*.sym
+circuit_js

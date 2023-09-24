@@ -138,9 +138,10 @@ template matMin (m,n,p) {
 
 template ShortestPath(n, steps) {
   signal input adj[n][n];
+  signal input src;
+  signal input dst;
   signal output out[n][n];
 
-  signal inter[steps][n][n];
   component matMinComp[steps];
 
   matMinComp[0] = matMin(n,n,n);
@@ -159,48 +160,36 @@ template BellmanFord(n) {
   signal input vertices[n];
   signal input edgeSrc[n*n];
   signal input edgeDst[n*n];
-  signal input weights[n*n];
   signal input source;
-  signal intermediate[n][n][n];
-  signal intermediatePred[n][n][n];
-  signal output distances[n];
+  signal output distancesAndPreds[2][n];
 
   var dists[n];
   var preds[n];
 
   for (var i = 0; i < n; i++) {
-    dists[i] = 10000000000000;
+    dists[i] = 1000000000000;
     preds[i] = -1;
   }
 
   dists[source] = 0;
 
-  // get number of vertices
-  //var nVertices = size(vertices);
-  //var nEdges = size(edgeSrc);
-
   for (var i = 0; i < n-1; i++) {
-    for (var j = 0; j < n; j++) {
+    for (var j = 0; j < n*n; j++) {
       var u = edgeSrc[j];
       var v = edgeDst[j];
-      var w = weights[j];
 
-      intermediate[i][j][v] <== dists[u] + w;
-      intermediatePred[i][j][v] <== u;
-
-      if (dists[v] > dists[u] + w) {
-        dists[v] = dists[u] + w;
+      if (dists[v] > dists[u] + 1) {
+        dists[v] = dists[u] + 1;
         preds[v] = u;
       }
     }
   }
 
   for (var i = 0; i < n ; i++) {
-    distances[i] <-- dists[i];
+    distancesAndPreds[0][i] <-- dists[i];
+    distancesAndPreds[1][i] <-- preds[i];
   }
 }
 
-//component main {public [vertices, edgeSrc, edgeDst, weights, source]} = BellmanFord(32);
-component main {public [adj]} = ShortestPath(16, 3);
-//component main {public [in]} = test(32);
-//component main {public [adj]} = BellmanFord(32);
+component main {public [adj, src, dst]} = ShortestPath(16, 3);
+
